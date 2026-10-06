@@ -25,6 +25,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.preference.PreferenceManager;
 
 import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.winlator.contentdialog.AboutDialog;
 import com.winlator.core.AppUtils;
 import com.winlator.core.Callback;
@@ -46,6 +47,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private Callback<Uri> openFileCallback;
     private SharedPreferences preferences;
     private Fragment currentFragment;
+    private BottomNavigationView bottomNavigation;
+    private com.google.android.material.navigationrail.NavigationRailView navigationRail;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,8 +59,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         drawerLayout = findViewById(R.id.DrawerLayout);
         NavigationView navigationView = findViewById(R.id.NavigationView);
         navigationView.setNavigationItemSelectedListener(this);
+        bottomNavigation = findViewById(R.id.LibraryNavigation);
+        bottomNavigation.setOnNavigationItemSelectedListener(this::onNavigationItemSelected);
+        navigationRail = findViewById(R.id.LibraryNavigationRail);
+        navigationRail.setOnItemSelectedListener(this::onNavigationItemSelected);
 
         setSupportActionBar(findViewById(R.id.Toolbar));
+        getWindow().setStatusBarColor(AppUtils.getThemeColor(this, R.attr.libraryHeader));
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
 
@@ -66,15 +74,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         Intent intent = getIntent();
         editInputControls = intent.getBooleanExtra("edit_input_controls", false);
         if (editInputControls) {
+            bottomNavigation.setVisibility(android.view.View.GONE);
             selectedProfileId = intent.getIntExtra("selected_profile_id", 0);
             actionBar.setHomeAsUpIndicator(R.drawable.icon_action_bar_back);
             onNavigationItemSelected(navigationView.getMenu().findItem(R.id.menu_item_input_controls));
             navigationView.setCheckedItem(R.id.menu_item_input_controls);
         }
         else {
-            boolean showShortcutsFirst = preferences.getBoolean("show_shortcuts_first", false);
             int selectedMenuItemId = intent.getIntExtra("selected_menu_item_id", 0);
-            int menuItemId = selectedMenuItemId > 0 ? selectedMenuItemId : (showShortcutsFirst ? R.id.menu_item_shortcuts : R.id.menu_item_containers);
+            int menuItemId = selectedMenuItemId > 0 ? selectedMenuItemId : R.id.menu_item_shortcuts;
 
             actionBar.setHomeAsUpIndicator(R.drawable.icon_action_bar_menu);
             onNavigationItemSelected(navigationView.getMenu().findItem(menuItemId));
@@ -119,6 +127,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public void onConfigurationChanged(@NonNull Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
+        updateNavigationLayout();
         if ((newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE ||
             newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) && currentFragment instanceof BaseFileManagerFragment) {
             ((BaseFileManagerFragment)currentFragment).onOrientationChanged();
@@ -127,17 +136,27 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public void onBackPressed() {
+        if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+            drawerLayout.closeDrawer(GravityCompat.START);
+            return;
+        }
+        if (editInputControls) {
+            setResult(RESULT_OK);
+            finish();
+            return;
+        }
         if (currentFragment != null && currentFragment.isVisible()) {
             if (currentFragment instanceof BaseFileManagerFragment) {
                 BaseFileManagerFragment fileManagerFragment = (BaseFileManagerFragment)currentFragment;
                 if (fileManagerFragment.onBackPressed()) return;
             }
-            else if (currentFragment instanceof ContainersFragment) {
+            if (currentFragment instanceof ShortcutsFragment) {
                 finish();
+                return;
             }
         }
 
-        showFragment(new ContainersFragment());
+        navigateTo(R.id.menu_item_shortcuts);
     }
 
     public void setOpenFileCallback(Callback<Uri> openFileCallback) {
@@ -191,7 +210,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 showFragment(new ShortcutsFragment());
                 break;
             case R.id.menu_item_containers:
-                preferences.edit().putBoolean("show_shortcuts_first", false).apply();
                 showFragment(new ContainersFragment());
                 break;
             case R.id.menu_item_input_controls:
@@ -204,7 +222,31 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 (new AboutDialog(this)).show();
                 break;
         }
+        NavigationView navigation = findViewById(R.id.NavigationView);
+        navigation.setCheckedItem(item.getItemId());
+        MenuItem destination = bottomNavigation.getMenu().findItem(item.getItemId());
+        if (destination != null) {
+            destination.setChecked(true);
+            navigationRail.getMenu().findItem(item.getItemId()).setChecked(true);
+            updateNavigationLayout();
+        }
+        else if (item.getItemId() == R.id.menu_item_input_controls) {
+            bottomNavigation.setVisibility(android.view.View.GONE);
+            navigationRail.setVisibility(android.view.View.GONE);
+        }
         return true;
+    }
+
+    private void updateNavigationLayout() {
+        boolean visible = !editInputControls && !(currentFragment instanceof InputControlsFragment);
+        boolean wide = getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE;
+        bottomNavigation.setVisibility(visible && !wide ? android.view.View.VISIBLE : android.view.View.GONE);
+        navigationRail.setVisibility(visible && wide ? android.view.View.VISIBLE : android.view.View.GONE);
+    }
+
+    public void navigateTo(int menuItemId) {
+        NavigationView navigation = findViewById(R.id.NavigationView);
+        onNavigationItemSelected(navigation.getMenu().findItem(menuItemId));
     }
 
     public void showFragment(Fragment fragment) {

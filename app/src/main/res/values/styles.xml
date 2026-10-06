@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="AppThemeBase" parent="@style/Theme.AppCompat.Light.NoActionBar">
+    <style name="AppThemeBase" parent="@style/Theme.MaterialComponents.Light.NoActionBar.Bridge">
+        <item name="colorSurface">?attr/libraryCard</item>
+        <item name="colorOnSurface">?attr/libraryText</item>
+        <item name="colorSecondary">?attr/libraryAccent</item>
         <item name="tabSelectedTextColor">?attr/colorPrimaryText</item>
         <item name="tabTextColor">?attr/colorSecondaryText</item>
         <item name="android:windowBackground">?attr/colorPrimarySurface</item>
@@ -21,6 +24,14 @@
         <item name="radioButtonStyle">@style/RadioButton</item>
     </style>
     <style name="AppThemeLight" parent="@style/AppThemeBase">
+        <item name="librarySurface">#F7F9FC</item>
+        <item name="libraryCard">#FFFFFF</item>
+        <item name="libraryTint">#E3EDF9</item>
+        <item name="libraryAccent">#244D7A</item>
+        <item name="libraryHeader">#244D7A</item>
+        <item name="libraryOnHeader">#FFFFFF</item>
+        <item name="libraryText">#192B42</item>
+        <item name="librarySecondaryText">#53677E</item>
         <item name="colorAccent">#0288d1</item>
         <item name="colorPrimary">#607d8b</item>
         <item name="colorPrimaryDark">#455a64</item>
@@ -39,6 +50,14 @@
         <item name="progressBarIndeterminateImage">@drawable/progress_bar_indeterminate_light</item>
     </style>
     <style name="AppThemeDark" parent="@style/AppThemeBase">
+        <item name="librarySurface">#121A25</item>
+        <item name="libraryCard">#1C2735</item>
+        <item name="libraryTint">#273E59</item>
+        <item name="libraryAccent">#B4D3F5</item>
+        <item name="libraryHeader">#273E59</item>
+        <item name="libraryOnHeader">#E5EDF8</item>
+        <item name="libraryText">#E5EDF8</item>
+        <item name="librarySecondaryText">#B4C5DC</item>
         <item name="colorAccent">#0288d1</item>
         <item name="colorPrimary">#505963</item>
         <item name="colorPrimaryDark">#3f474f</item>

@@ -1,0 +1,295 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-06T10:33:36Z",
+  "title": "Design System: Winlator 游戏库",
+  "extensions": {
+    "colorMeta": {
+      "library-surface-light": {
+        "role": "neutral",
+        "displayName": "冷纸／深夜底色（浅色）"
+      },
+      "library-surface-dark": {
+        "role": "neutral",
+        "displayName": "冷纸／深夜底色（深色）"
+      },
+      "library-card-light": {
+        "role": "neutral",
+        "displayName": "白卡／深蓝灰卡（浅色）"
+      },
+      "library-card-dark": {
+        "role": "neutral",
+        "displayName": "白卡／深蓝灰卡（深色）"
+      },
+      "library-tint-light": {
+        "role": "neutral",
+        "displayName": "冰雾／蓝灰衬色（浅色）"
+      },
+      "library-tint-dark": {
+        "role": "neutral",
+        "displayName": "冰雾／蓝灰衬色（深色）"
+      },
+      "library-accent-light": {
+        "role": "primary",
+        "displayName": "目录蓝／浅冰蓝（浅色）"
+      },
+      "library-accent-dark": {
+        "role": "primary",
+        "displayName": "目录蓝／浅冰蓝（深色）"
+      },
+      "library-header-light": {
+        "role": "primary",
+        "displayName": "目录页眉（浅色）"
+      },
+      "library-header-dark": {
+        "role": "primary",
+        "displayName": "目录页眉（深色）"
+      },
+      "library-on-header-light": {
+        "role": "neutral",
+        "displayName": "页眉正文（浅色）"
+      },
+      "library-on-header-dark": {
+        "role": "neutral",
+        "displayName": "页眉正文（深色）"
+      },
+      "library-text-light": {
+        "role": "neutral",
+        "displayName": "深墨／浅灰白正文（浅色）"
+      },
+      "library-text-dark": {
+        "role": "neutral",
+        "displayName": "深墨／浅灰白正文（深色）"
+      },
+      "library-secondary-text-light": {
+        "role": "neutral",
+        "displayName": "从属蓝灰（浅色）"
+      },
+      "library-secondary-text-dark": {
+        "role": "neutral",
+        "displayName": "从属蓝灰（深色）"
+      }
+    },
+    "typographyMeta": {
+      "title": {
+        "displayName": "标题",
+        "purpose": "程序名与库分区；Android textStyle=bold。"
+      },
+      "body": {
+        "displayName": "正文",
+        "purpose": "LibraryText 基础文字。"
+      },
+      "label": {
+        "displayName": "辅助标签",
+        "purpose": "容器、相对目录及项目数量。"
+      },
+      "supporting": {
+        "displayName": "从属说明",
+        "purpose": "路径与设置中的布局说明。"
+      },
+      "empty-hint": {
+        "displayName": "空状态说明",
+        "purpose": "解释无数据、无匹配、无收藏或加载失败的下一步。"
+      }
+    },
+    "shadows": [],
+    "motion": [],
+    "breakpoints": [
+      {
+        "name": "landscape-orientation",
+        "value": "Configuration.ORIENTATION_LANDSCAPE"
+      }
+    ],
+    "native": {
+      "platform": "android",
+      "stack": "Java / XML Views / AppCompat / MaterialComponents / RecyclerView",
+      "schemaNotes": "原生组件说明位于 extensions.nativeComponents；components 不提供虚构 HTML/CSS，Web shadow DOM 面板不能渲染这些原生实现。frontmatter 是 token 原语的唯一规范来源；未生成合成 tonal ramps。",
+      "scope": "游戏库、主导航、设置新增的布局偏好与系统主题接入；旧设置、容器编辑和运行界面不属于本次完整视觉覆盖。",
+      "direction": {
+        "mode": "Operate",
+        "topology": "Collection catalog",
+        "buildPath": "code",
+        "seed": "88d1c4f4",
+        "surfaceBrief": ".impeccable/surfaces/java-com-winlator-shortcutsfragment-java-d4e9619c.md"
+      },
+      "layout": {
+        "orientationSource": "app/src/main/java/com/winlator/ShortcutsFragment.java:272",
+        "navigationSource": "app/src/main/java/com/winlator/MainActivity.java:240",
+        "gridColumnRule": "max(1, floor(actualRecyclerViewWidthDp / 180))",
+        "landscape": "80dp navigation rail，260dp 满高可纵向滚动左控制区，右侧内容填满剩余空间。",
+        "recent": "RecyclerView 与项目均 wrap_content；项目宽度竖屏 300dp，横屏 228dp。"
+      },
+      "assets": {
+        "policy": "已有程序图标；缺失时复用 container_folder / container_file_link。新增视觉背景仅 XML shape / layer-list / vector。",
+        "newShippingRaster": 0,
+        "promptProvenance": "不适用：未新增生成图像。",
+        "source": "app/src/main/java/com/winlator/ShortcutsFragment.java:473"
+      },
+      "verification": {
+        "extraction": "从列出的当前 Java/XML 读取；抽样核对模拟器截图。",
+        "screenshots": [
+          "../.impeccable/review/phone-grid.png",
+          "../.impeccable/review/phone-landscape.png"
+        ],
+        "nativeDetector": "未运行",
+        "reviewScope": "ship 仅针对已解决的五项 material fix 列表，不等同于全产品验收。",
+        "handoffEvidence": "父任务已完成独立 APK 构建、5 项 metadata 单测、7 项原生 smoke 与 5 项 edge 检查；此文档任务未重复执行。",
+        "unverified": [
+          "真实 Windows 游戏运行／退出",
+          "游戏退出引发的真实重启",
+          "物理设备",
+          "TalkBack",
+          "专门平板布局"
+        ]
+      },
+      "sources": [
+        "app/src/main/java/com/winlator/ShortcutsFragment.java",
+        "app/src/main/java/com/winlator/MainActivity.java",
+        "app/src/main/java/com/winlator/SettingsFragment.java",
+        "app/src/main/java/com/winlator/core/AppUtils.java",
+        "app/src/main/res/values/styles.xml",
+        "app/src/main/res/values/library.xml",
+        "app/src/main/res/layout/game_library_fragment.xml",
+        "app/src/main/res/layout/game_library_grid_item.xml",
+        "app/src/main/res/layout/game_library_list_item.xml",
+        "app/src/main/res/layout/main_activity.xml",
+        "app/src/main/res/layout/settings_fragment.xml",
+        "app/src/main/res/drawable/library_card.xml",
+        "app/src/main/res/drawable/library_tint.xml",
+        "app/src/main/res/drawable/library_spinner.xml",
+        "app/src/main/res/drawable/library_dropdown.xml",
+        "app/src/main/res/color/library_navigation.xml"
+      ]
+    },
+    "nativeComponents": [
+      {
+        "name": "名称搜索",
+        "kind": "input",
+        "refersTo": [
+          "search-light",
+          "search-dark"
+        ],
+        "description": "展开的 AppCompat SearchView，最小触控高度，卡片背景；正文／提示／图标按游戏库主题解析。",
+        "source": "app/src/main/res/layout/game_library_fragment.xml:9",
+        "behaviorSource": "app/src/main/java/com/winlator/ShortcutsFragment.java:97",
+        "states": "名称查询，清除与系统输入状态由原生控件处理。"
+      },
+      {
+        "name": "容器选择",
+        "kind": "input",
+        "refersTo": [
+          "container-picker-light",
+          "container-picker-dark"
+        ],
+        "description": "原生 Spinner 与圆角 layer-list 背景、XML vector 箭头。标签仍按实际 ArrayAdapter／应用样式继承。",
+        "source": "app/src/main/res/layout/game_library_fragment.xml:29",
+        "appearanceSource": "app/src/main/res/drawable/library_spinner.xml"
+      },
+      {
+        "name": "All／Favorites",
+        "kind": "chip",
+        "description": "单选、必选的 MaterialComponents Choice Chips；启用 ensureMinTouchTargetSize。",
+        "source": "app/src/main/res/layout/game_library_fragment.xml:15",
+        "states": "已选／未选沿用 MaterialComponents 控件规则。"
+      },
+      {
+        "name": "图标网格",
+        "kind": "card",
+        "refersTo": [
+          "grid-card-light",
+          "grid-card-dark"
+        ],
+        "description": "真实图标、两行程序名与容器／相对路径；内容项启动，overflow 独立操作。",
+        "source": "app/src/main/res/layout/game_library_grid_item.xml",
+        "states": "原生 selectableItemBackground 点击反馈；收藏是装饰标记与无障碍名称的一部分；损坏快捷方式有文字状态。"
+      },
+      {
+        "name": "紧凑列表",
+        "kind": "custom",
+        "refersTo": [
+          "list-item",
+          "overflow"
+        ],
+        "description": "开放的内容行，图标与最多两行名称／上下文；独立更多操作。",
+        "source": "app/src/main/res/layout/game_library_list_item.xml",
+        "states": "原生点击反馈与独立 overflow。"
+      },
+      {
+        "name": "最近启动",
+        "kind": "custom",
+        "refersTo": [
+          "list-item",
+          "overflow"
+        ],
+        "description": "真实启动记录复用列表项，衬色背景与内容驱动高度；横向浏览。",
+        "source": "app/src/main/java/com/winlator/ShortcutsFragment.java:457",
+        "states": "没有记录、处于目录、收藏或筛选时隐藏；记录不证明运行成功。"
+      },
+      {
+        "name": "主导航",
+        "kind": "nav",
+        "refersTo": [
+          "navigation-light",
+          "navigation-dark"
+        ],
+        "description": "竖屏 BottomNavigationView，横屏 NavigationRailView；Library／Containers／Settings 共用菜单。",
+        "source": "app/src/main/res/layout/main_activity.xml",
+        "appearanceSource": "app/src/main/res/color/library_navigation.xml",
+        "states": "checked 使用 libraryAccent，其余使用 librarySecondaryText；遵循原生返回与现有侧边菜单。"
+      },
+      {
+        "name": "布局偏好",
+        "kind": "input",
+        "description": "设置顶部的全宽 Spinner，Grid／List 持久化；旧设置仍继承现有 ComboBox 与页面样式。",
+        "source": "app/src/main/res/layout/settings_fragment.xml:17",
+        "behaviorSource": "app/src/main/java/com/winlator/SettingsFragment.java:117"
+      },
+      {
+        "name": "空状态与行动",
+        "kind": "button",
+        "description": "区分无数据、无收藏、无匹配与加载失败；原生 Button 承担容器、清除筛选或重试。",
+        "source": "app/src/main/res/layout/game_library_fragment.xml:62",
+        "behaviorSource": "app/src/main/java/com/winlator/ShortcutsFragment.java:223",
+        "states": "状态文字与真实下一步同步，不只改变颜色。"
+      }
+    ]
+  },
+  "components": [],
+  "narrative": {
+    "northStar": "冷色程序目录",
+    "overview": "蓝色导航提供稳定的屏幕上下文，冷浅色与深色阅读表面承载真实程序名称和图标。界面的性格直接、清楚，先让玩家辨认已有快捷方式，再提供搜索、筛选和再次启动入口。Android 原生控件承担交互，视觉表达集中在配色、内容层级和空间节奏。\n\n本文件记录当前游戏库、主导航及设置页新增的布局偏好；它不是全部旧设置、容器编辑器或运行界面的统一改造规范。设计依据是 Java/XML 实现及模拟器截图；方向采用已授权的推荐方案。最近启动和收藏是本地元数据，不能作为运行成功或兼容性的视觉承诺。",
+    "keyCharacteristics": [
+      "蓝色页眉与冷色明暗表面，跟随应用的系统／浅色／深色主题选择。",
+      "系统字体、两行程序标题与从属的容器／路径信息。",
+      "默认图标网格，可持久切换紧凑列表。",
+      "整项启动与独立的更多操作按钮各自承担明确任务。",
+      "横屏使用导航轨道及可纵向滚动的左控制区。"
+    ],
+    "rules": [
+      {
+        "name": "The Theme Attribute Rule",
+        "body": "新游戏库控件继续读取 `library*` theme attributes；浅色与深色值成对维护。当前实现是静态主题方案，没有墙纸动态配色。",
+        "section": "colors"
+      },
+      {
+        "name": "The Content Height Rule",
+        "body": "名称和说明保持内容驱动的高度，文字缩放不通过固定文本高度抵消；两行省略必须保留完整的启动操作无障碍名称。",
+        "section": "typography"
+      }
+    ],
+    "dos": [
+      "Do 以实际 Java/XML 及 Android 截图作为新增游戏库样式的依据，尺寸用 `dp`，字体用 `sp`。",
+      "Do 配对维护游戏库明暗属性，并保留系统主题选择与系统字体缩放。",
+      "Do 保留独立的（48dp × 48dp）更多操作目标和整项启动语义。",
+      "Do 用容器／相对路径区分同名程序，保留内容驱动高度和完整操作标签。",
+      "Do 让最近区只展示真实本地记录，继续复用已有程序或文件夹图标。",
+      "Do 横屏使用当前 rail 与可滚动左控制区，按内容区实际宽度重新计算列数。"
+    ],
+    "donts": [
+      "Don't 把未统一改造的旧设置、容器页面和运行界面宣称为本次设计系统的完整覆盖。",
+      "Don't 添加源码没有的阴影、字距、断点、动效或动态配色 token。",
+      "Don't 把游戏库项目名／最近启动记录包装成兼容性、成功运行或进度恢复证明。",
+      "Don't 用新增封面、虚构程序或生成图片替换真实快捷方式内容。",
+      "Don't 将模拟器布局和边界检查当成真实 Windows 游戏、物理设备或 TalkBack 验证。"
+    ]
+  }
+}

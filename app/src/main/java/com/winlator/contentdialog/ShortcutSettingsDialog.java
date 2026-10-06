@@ -178,7 +178,8 @@ public class ShortcutSettingsDialog extends ContentDialog {
         newName = StringUtils.clearReservedChars(newName);
         File parent = shortcut.file.getParentFile();
         File newFile = new File(parent, newName+".desktop");
-        if (!newFile.isFile()) shortcut.file.renameTo(newFile);
+        if (newFile.exists() || !shortcut.file.renameTo(newFile)) return;
+        fragment.onShortcutRenamed(shortcut, newFile);
 
         File linkFile = new File(parent, shortcut.name+".lnk");
         if (linkFile.isFile()) {

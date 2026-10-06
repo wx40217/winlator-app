@@ -35,6 +35,7 @@ import androidx.preference.PreferenceManager;
 
 import com.google.android.material.tabs.TabLayout;
 import com.winlator.R;
+import com.winlator.BuildConfig;
 import com.winlator.SettingsFragment;
 
 import java.lang.ref.WeakReference;
@@ -44,7 +45,7 @@ import java.util.TimerTask;
 
 public abstract class AppUtils {
     public static final String DIRECTORY_DOWNLOADS = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath();
-    public static final String INTERNAL_STORAGE = "/data/data/com.winlator/storage";
+    public static final String INTERNAL_STORAGE = "/data/data/"+BuildConfig.APPLICATION_ID+"/storage";
     private static WeakReference<Toast> globalToastReference = null;
 
     public static class RestartApplicationOptions {
@@ -377,7 +378,12 @@ public abstract class AppUtils {
 
     public static void setActivityTheme(Activity activity) {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(activity);
-        int appTheme = preferences.getInt("app_theme", SettingsFragment.APP_THEME_DARK);
+        int appTheme = preferences.getInt("app_theme", SettingsFragment.APP_THEME_SYSTEM);
+        if (appTheme == SettingsFragment.APP_THEME_SYSTEM) {
+            boolean dark = (activity.getResources().getConfiguration().uiMode & android.content.res.Configuration.UI_MODE_NIGHT_MASK)
+                == android.content.res.Configuration.UI_MODE_NIGHT_YES;
+            appTheme = dark ? SettingsFragment.APP_THEME_DARK : SettingsFragment.APP_THEME_LIGHT;
+        }
         if (appTheme == SettingsFragment.APP_THEME_LIGHT) {
             activity.setTheme(R.style.AppThemeLight);
         }

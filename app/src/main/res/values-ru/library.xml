@@ -1,0 +1,37 @@
+<resources>
+    <string name="game_library">Библиотека игр</string>
+    <string name="paste">Вставить</string>
+    <string name="library_search">Поиск по названию игры</string>
+    <string name="library_loading">Загрузка библиотеки игр</string>
+    <string name="library_load_error">Не удалось загрузить библиотеку игр</string>
+    <string name="library_load_error_hint">Попробуйте ещё раз. Если проблема остаётся, проверьте ярлыки в контейнерах.</string>
+    <string name="library_retry">Повторить</string>
+    <string name="library_invalid">Нужен ремонт</string>
+    <string name="library_invalid_hint">Ярлык повреждён. Откройте его настройки или создайте заново в контейнере.</string>
+    <string name="native_resolution">Нативное разрешение</string>
+    <string name="library_all">Все</string>
+    <string name="library_recent">Недавно запущенные</string>
+    <string name="library_all_games">Все игры</string>
+    <string name="library_all_containers">Все контейнеры</string>
+    <string name="library_layout">Вид библиотеки игр</string>
+    <string name="library_system_theme">Система</string>
+    <string name="library_grid">Сетка значков</string>
+    <string name="library_list">Компактный список</string>
+    <string name="library_layout_hint">Выберите вид игр. Ваш выбор сохраняется.</string>
+    <string name="library_remove_favorite">Убрать из избранного</string>
+    <string name="library_more">Действия для %1$s</string>
+    <string name="library_launch">Запустить %1$s</string>
+    <string name="library_open_folder">Открыть папку %1$s</string>
+    <string name="library_count">Элементов: %1$d</string>
+    <string name="library_empty">Нет программ для запуска</string>
+    <string name="library_empty_hint">Откройте контейнер, установите программу и создайте её ярлык.</string>
+    <string name="library_no_results">Игры не найдены</string>
+    <string name="library_no_results_hint">Попробуйте другое название или сбросьте фильтры.</string>
+    <string name="library_no_favorites">Избранного пока нет</string>
+    <string name="library_no_favorites_hint">Добавьте игру через меню действий.</string>
+    <string name="library_clear_filters">Сбросить фильтры</string>
+    <string name="library_missing_shortcut">Этот ярлык больше недоступен. Проверьте его контейнер.</string>
+    <string name="library_launch_failed">Не удалось открыть среду. Повторите попытку или проверьте настройки игры.</string>
+    <string name="library_inherited">Использует настройки контейнера</string>
+    <string name="library_overrides">Есть отдельные настройки игры</string>
+</resources>

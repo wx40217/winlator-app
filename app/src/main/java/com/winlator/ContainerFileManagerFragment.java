@@ -355,7 +355,10 @@ public class ContainerFileManagerFragment extends BaseFileManagerFragment<FileIn
                     case R.id.menu_item_rename:
                         clearClipboard();
                         ContentDialog.prompt(context, R.string.rename, file.name, (newName) -> {
-                            file.renameTo(newName);
+                            File origin = file.toFile();
+                            if (file.renameTo(newName)) {
+                                onFileRenamed(origin, new File(origin.getParentFile(), com.winlator.core.StringUtils.clearReservedChars(newName)));
+                            }
                             refreshContent();
                         });
                         break;

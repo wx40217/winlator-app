@@ -164,11 +164,15 @@ public abstract class BaseFileManagerFragment<T> extends Fragment {
         }
 
         preloaderDialog.show(R.string.copying_files);
+        final Clipboard operation = clipboard;
         Executors.newSingleThreadExecutor().execute(() -> {
-            for (File originFile : clipboard.files) {
+            for (File originFile : operation.files) {
                 if (originFile.exists()) {
-                    File targetFile = new File(clipboard.targetDir, originFile.getName());
-                    if (FileUtils.copy(originFile, targetFile) && clipboard.cutMode) FileUtils.delete(originFile);
+                    File targetFile = new File(operation.targetDir, originFile.getName());
+                    if (FileUtils.copy(originFile, targetFile)) {
+                        boolean moved = operation.cutMode && FileUtils.delete(originFile);
+                        onFilePasted(originFile, targetFile, moved);
+                    }
                 }
             }
 
@@ -183,7 +187,10 @@ public abstract class BaseFileManagerFragment<T> extends Fragment {
     protected void removeFile(final File file) {
         preloaderDialog.show(R.string.removing_files);
         Executors.newSingleThreadExecutor().execute(() -> {
-            FileUtils.delete(file);
+            if (FileUtils.delete(file)) {
+                int owner = getOwningContainerId(file);
+                if (owner > 0) new com.winlator.library.GameLibraryStore(manager.getContext()).remove(owner, file);
+            }
 
             getActivity().runOnUiThread(() -> {
                 clearClipboard();
@@ -191,6 +198,24 @@ public abstract class BaseFileManagerFragment<T> extends Fragment {
                 preloaderDialog.close();
             });
         });
+    }
+
+    protected void onFilePasted(File origin, File target, boolean moved) {
+        if (moved) onFileRenamed(origin, target);
+    }
+
+    public void onFileRenamed(File origin, File target) {
+        int oldOwner = getOwningContainerId(origin), newOwner = getOwningContainerId(target);
+        if (oldOwner > 0 && newOwner > 0) {
+            new com.winlator.library.GameLibraryStore(manager.getContext()).move(oldOwner, origin, newOwner, target);
+        }
+    }
+
+    private int getOwningContainerId(File file) {
+        for (com.winlator.container.Container container : manager.getContainers()) {
+            if (file.getAbsolutePath().startsWith(container.getRootDir().getAbsolutePath() + File.separator)) return container.id;
+        }
+        return 0;
     }
 
     public void clearClipboard() {
