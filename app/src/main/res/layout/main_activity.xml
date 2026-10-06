@@ -17,13 +17,23 @@
             android:layout_height="?actionBarSize"
             android:id="@+id/Toolbar"
             app:layout_scrollFlags="enterAlways|scroll"
+            android:background="?attr/libraryHeader"
+            app:titleTextColor="?attr/libraryOnHeader"
             app:title="@string/app_name" />
 
         <FrameLayout
             android:id="@+id/FLFragmentContainer"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
             app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
+        <com.google.android.material.bottomnavigation.BottomNavigationView
+            android:id="@+id/LibraryNavigation"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:background="?attr/libraryCard"
+            app:itemIconTint="@color/library_navigation"
+            app:itemTextColor="@color/library_navigation"
+            app:labelVisibilityMode="labeled" app:menu="@menu/library_navigation" />
     </LinearLayout>
 
     <com.google.android.material.navigation.NavigationView

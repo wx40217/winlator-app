@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <attr name="librarySurface" format="color" />
+    <attr name="libraryCard" format="color" />
+    <attr name="libraryTint" format="color" />
+    <attr name="libraryAccent" format="color" />
+    <attr name="libraryHeader" format="color" />
+    <attr name="libraryOnHeader" format="color" />
+    <attr name="libraryText" format="color" />
+    <attr name="librarySecondaryText" format="color" />
+    <style name="LibraryText">
+        <item name="android:textColor">?attr/libraryText</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+    <string name="game_library">Game library</string>
+    <string name="paste">Paste</string>
+    <string name="library_search">Search game names</string>
+    <string name="library_loading">Loading game library</string>
+    <string name="library_all">All</string>
+    <string name="library_recent">Recently launched</string>
+    <string name="library_all_games">All games</string>
+    <string name="library_all_containers">All containers</string>
+    <string name="library_layout">Game library layout</string>
+    <string name="library_system_theme">System</string>
+    <string name="library_grid">Icon grid</string>
+    <string name="library_list">Compact list</string>
+    <string name="library_layout_hint">Choose how games are displayed. Your selection is saved.</string>
+    <string name="library_remove_favorite">Remove from favorites</string>
+    <string name="library_more">More actions for %1$s</string>
+    <string name="library_launch">Launch %1$s</string>
+    <string name="library_open_folder">Open folder %1$s</string>
+    <string name="library_count">%1$d items</string>
+    <string name="library_empty">No programs to launch yet</string>
+    <string name="library_empty_hint">Open a container to install a program and create its shortcut.</string>
+    <string name="library_no_results">No matching games</string>
+    <string name="library_no_results_hint">Try a different name or clear the filters.</string>
+    <string name="library_no_favorites">No favorites yet</string>
+    <string name="library_no_favorites_hint">Add a game using its more actions menu.</string>
+    <string name="library_clear_filters">Clear filters</string>
+    <string name="library_missing_shortcut">This shortcut is no longer available. Check its container.</string>
+    <string name="library_launch_failed">Unable to open the runtime. Try again or check the game settings.</string>
+    <string name="library_inherited">Inherits container settings</string>
+    <string name="library_overrides">Has game-specific settings</string>
+    <string-array name="library_layout_entries">
+        <item>@string/library_grid</item><item>@string/library_list</item>
+    </string-array>
+</resources>

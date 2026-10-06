@@ -20,6 +20,7 @@ import android.widget.LinearLayout;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.AdapterView;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
@@ -75,6 +76,7 @@ public class SettingsFragment extends Fragment {
     public static final String DEFAULT_WINE_DEBUG_CHANNELS = "warn,err,fixme";
     public static final byte APP_THEME_LIGHT = 0;
     public static final byte APP_THEME_DARK = 1;
+    public static final byte APP_THEME_SYSTEM = 2;
     private Callback<Uri> selectWineFileCallback;
     private PreloaderDialog preloaderDialog;
     private SharedPreferences preferences;
@@ -112,6 +114,14 @@ public class SettingsFragment extends Fragment {
         View view = inflater.inflate(R.layout.settings_fragment, container, false);
         final Context context = getContext();
         preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        final Spinner sLibraryLayout = view.findViewById(R.id.SLibraryLayout);
+        sLibraryLayout.setSelection("LIST".equals(preferences.getString("shortcuts_view_style", "GRID")) ? 1 : 0);
+        sLibraryLayout.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override public void onItemSelected(AdapterView<?> parent, View item, int position, long id) {
+                preferences.edit().putString("shortcuts_view_style", position == 1 ? "LIST" : "GRID").apply();
+            }
+            @Override public void onNothingSelected(AdapterView<?> parent) {}
+        });
 
         final Spinner sSoundFont = view.findViewById(R.id.SSoundFont);
         String soundfont = preferences.getString("soundfont", null);
@@ -130,7 +140,8 @@ public class SettingsFragment extends Fragment {
         loadBox64PresetSpinner(view, sBox64Preset);
 
         final RadioGroup rgAppTheme = view.findViewById(R.id.RGAppTheme);
-        final int oldAppThemeId = preferences.getInt("app_theme", APP_THEME_DARK) == APP_THEME_DARK ? R.id.RBDark : R.id.RBLight;
+        int oldAppTheme = preferences.getInt("app_theme", APP_THEME_SYSTEM);
+        final int oldAppThemeId = oldAppTheme == APP_THEME_DARK ? R.id.RBDark : oldAppTheme == APP_THEME_LIGHT ? R.id.RBLight : R.id.RBSystem;
         rgAppTheme.check(oldAppThemeId);
 
         final CheckBox cbMoveCursorToTouchpoint = view.findViewById(R.id.CBMoveCursorToTouchpoint);
@@ -209,7 +220,7 @@ public class SettingsFragment extends Fragment {
         loadWineVersionSpinner(view, sWineVersion);
 
         final Spinner sLanguage = view.findViewById(R.id.SLanguage);
-        sLanguage.setSelection(LocaleHelper.getLocaleIndex(context));
+        sLanguage.setSelection(preferences.getInt("lc_index", -1) < 0 ? 3 : LocaleHelper.getLocaleIndex(context));
         final int oldLCIndex = sLanguage.getSelectedItemPosition();
 
         view.findViewById(R.id.BTReinstallSystemFiles).setOnClickListener((v) -> {
@@ -249,10 +260,10 @@ public class SettingsFragment extends Fragment {
             else editor.remove("gamepad_model");
 
             int newAppThemeId = rgAppTheme.getCheckedRadioButtonId();
-            editor.putInt("app_theme", newAppThemeId == R.id.RBLight ? APP_THEME_LIGHT : APP_THEME_DARK);
+            editor.putInt("app_theme", newAppThemeId == R.id.RBLight ? APP_THEME_LIGHT : newAppThemeId == R.id.RBDark ? APP_THEME_DARK : APP_THEME_SYSTEM);
 
             int newLCIndex = sLanguage.getSelectedItemPosition();
-            editor.putInt("lc_index", newLCIndex);
+            editor.putInt("lc_index", newLCIndex == 3 ? -1 : newLCIndex);
             boolean restartApp = oldLCIndex != newLCIndex || oldAppThemeId != newAppThemeId;
 
             int midiInputDevicePosition = sMIDIInputDevice.getSelectedItemPosition();
@@ -272,12 +283,7 @@ public class SettingsFragment extends Fragment {
 
             if (editor.commit()) {
                 if (!restartApp) {
-                    NavigationView navigationView = getActivity().findViewById(R.id.NavigationView);
-                    navigationView.setCheckedItem(R.id.menu_item_containers);
-                    FragmentManager fragmentManager = getParentFragmentManager();
-                    fragmentManager.beginTransaction()
-                        .replace(R.id.FLFragmentContainer, new ContainersFragment())
-                        .commit();
+                    ((MainActivity)getActivity()).navigateTo(R.id.menu_item_shortcuts);
                 }
                 else AppUtils.restartActivity(getActivity());
             }

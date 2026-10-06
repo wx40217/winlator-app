@@ -161,7 +161,10 @@ public class ContainerManager {
     }
 
     private void removeContainer(Container container) {
-        if (FileUtils.delete(container.getRootDir())) containers.remove(container);
+        if (FileUtils.delete(container.getRootDir())) {
+            new com.winlator.library.GameLibraryStore(context).remove(container.id, container.getRootDir());
+            containers.remove(container);
+        }
     }
 
     public ArrayList<Shortcut> loadShortcuts(Shortcut selectedFolder) {

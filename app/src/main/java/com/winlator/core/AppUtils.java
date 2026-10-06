@@ -377,7 +377,12 @@ public abstract class AppUtils {
 
     public static void setActivityTheme(Activity activity) {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(activity);
-        int appTheme = preferences.getInt("app_theme", SettingsFragment.APP_THEME_DARK);
+        int appTheme = preferences.getInt("app_theme", SettingsFragment.APP_THEME_SYSTEM);
+        if (appTheme == SettingsFragment.APP_THEME_SYSTEM) {
+            boolean dark = (activity.getResources().getConfiguration().uiMode & android.content.res.Configuration.UI_MODE_NIGHT_MASK)
+                == android.content.res.Configuration.UI_MODE_NIGHT_YES;
+            appTheme = dark ? SettingsFragment.APP_THEME_DARK : SettingsFragment.APP_THEME_LIGHT;
+        }
         if (appTheme == SettingsFragment.APP_THEME_LIGHT) {
             activity.setTheme(R.style.AppThemeLight);
         }
