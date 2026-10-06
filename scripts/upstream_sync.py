@@ -5,6 +5,7 @@ import json
 import os
 from pathlib import Path
 import subprocess
+import sys
 import urllib.request
 
 REPOS = {'app': 'wx40217/winlator-app', 'main': 'wx40217/winlator'}
@@ -14,7 +15,12 @@ APP_URL = 'https://github.com/wx40217/winlator-app.git'
 
 
 def git(*args, cwd=None):
-    return subprocess.check_output(['git', *args], cwd=cwd, text=True).strip()
+    try:
+        return subprocess.check_output(['git', *args], cwd=cwd, text=True).strip()
+    except subprocess.CalledProcessError as error:
+        # Git reports conflict file names on stdout; keep them in takeover logs.
+        print(error.output or '', file=sys.stderr)
+        raise
 
 
 def ancestor(old, new, cwd=None):
