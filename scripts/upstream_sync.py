@@ -41,9 +41,9 @@ def prepare(kind, output, upstream=None, app_url=APP_URL, app_upstream=None):
         # Public cross-repo reads do not require a cross-repo credential.
         app_repo = output / 'app-probe'
         git('init', str(app_repo))
-        git('fetch', '--no-tags', app_url, 'main', cwd=app_repo)
+        git('fetch', '--no-tags', '--filter=blob:none', app_url, 'main', cwd=app_repo)
         app_sha = git('rev-parse', 'FETCH_HEAD', cwd=app_repo)
-        git('fetch', '--no-tags', app_upstream or UPSTREAM['app'], 'main', cwd=app_repo)
+        git('fetch', '--no-tags', '--filter=blob:none', app_upstream or UPSTREAM['app'], 'main', cwd=app_repo)
         latest = git('rev-parse', 'FETCH_HEAD', cwd=app_repo)
         if not ancestor(latest, app_sha, cwd=app_repo):
             raise RuntimeError('App fork has not incorporated latest upstream; handle app sync first')
