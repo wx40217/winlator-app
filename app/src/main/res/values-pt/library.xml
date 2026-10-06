@@ -3,6 +3,12 @@
     <string name="paste">Colar</string>
     <string name="library_search">Pesquisar nomes de jogos</string>
     <string name="library_loading">Carregando biblioteca de jogos</string>
+    <string name="library_load_error">Não foi possível carregar a biblioteca de jogos</string>
+    <string name="library_load_error_hint">Tente novamente. Se o problema continuar, verifique os atalhos nos contêineres.</string>
+    <string name="library_retry">Tentar novamente</string>
+    <string name="library_invalid">Precisa de reparo</string>
+    <string name="library_invalid_hint">Este atalho está danificado. Abra as configurações ou recrie-o no contêiner.</string>
+    <string name="native_resolution">Resolução nativa</string>
     <string name="library_all">Todos</string>
     <string name="library_recent">Iniciados recentemente</string>
     <string name="library_all_games">Todos os jogos</string>

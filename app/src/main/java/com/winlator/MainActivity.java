@@ -48,6 +48,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private SharedPreferences preferences;
     private Fragment currentFragment;
     private BottomNavigationView bottomNavigation;
+    private com.google.android.material.navigationrail.NavigationRailView navigationRail;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,6 +61,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         navigationView.setNavigationItemSelectedListener(this);
         bottomNavigation = findViewById(R.id.LibraryNavigation);
         bottomNavigation.setOnNavigationItemSelectedListener(this::onNavigationItemSelected);
+        navigationRail = findViewById(R.id.LibraryNavigationRail);
+        navigationRail.setOnItemSelectedListener(this::onNavigationItemSelected);
 
         setSupportActionBar(findViewById(R.id.Toolbar));
         getWindow().setStatusBarColor(AppUtils.getThemeColor(this, R.attr.libraryHeader));
@@ -124,6 +127,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public void onConfigurationChanged(@NonNull Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
+        updateNavigationLayout();
         if ((newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE ||
             newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) && currentFragment instanceof BaseFileManagerFragment) {
             ((BaseFileManagerFragment)currentFragment).onOrientationChanged();
@@ -223,10 +227,21 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         MenuItem destination = bottomNavigation.getMenu().findItem(item.getItemId());
         if (destination != null) {
             destination.setChecked(true);
-            bottomNavigation.setVisibility(editInputControls ? android.view.View.GONE : android.view.View.VISIBLE);
+            navigationRail.getMenu().findItem(item.getItemId()).setChecked(true);
+            updateNavigationLayout();
         }
-        else if (item.getItemId() == R.id.menu_item_input_controls) bottomNavigation.setVisibility(android.view.View.GONE);
+        else if (item.getItemId() == R.id.menu_item_input_controls) {
+            bottomNavigation.setVisibility(android.view.View.GONE);
+            navigationRail.setVisibility(android.view.View.GONE);
+        }
         return true;
+    }
+
+    private void updateNavigationLayout() {
+        boolean visible = !editInputControls && !(currentFragment instanceof InputControlsFragment);
+        boolean wide = getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE;
+        bottomNavigation.setVisibility(visible && !wide ? android.view.View.VISIBLE : android.view.View.GONE);
+        navigationRail.setVisibility(visible && wide ? android.view.View.VISIBLE : android.view.View.GONE);
     }
 
     public void navigateTo(int menuItemId) {

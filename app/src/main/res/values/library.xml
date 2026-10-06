@@ -16,6 +16,11 @@
     <string name="paste">Paste</string>
     <string name="library_search">Search game names</string>
     <string name="library_loading">Loading game library</string>
+    <string name="library_load_error">Unable to load the game library</string>
+    <string name="library_load_error_hint">Try again. If it persists, check the shortcuts in your containers.</string>
+    <string name="library_retry">Try again</string>
+    <string name="library_invalid">Needs repair</string>
+    <string name="library_invalid_hint">This shortcut is damaged. Open its settings or recreate it in the container.</string>
     <string name="library_all">All</string>
     <string name="library_recent">Recently launched</string>
     <string name="library_all_games">All games</string>

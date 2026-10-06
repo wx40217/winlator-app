@@ -3,6 +3,12 @@
     <string name="paste">Вставить</string>
     <string name="library_search">Поиск по названию игры</string>
     <string name="library_loading">Загрузка библиотеки игр</string>
+    <string name="library_load_error">Не удалось загрузить библиотеку игр</string>
+    <string name="library_load_error_hint">Попробуйте ещё раз. Если проблема остаётся, проверьте ярлыки в контейнерах.</string>
+    <string name="library_retry">Повторить</string>
+    <string name="library_invalid">Нужен ремонт</string>
+    <string name="library_invalid_hint">Ярлык повреждён. Откройте его настройки или создайте заново в контейнере.</string>
+    <string name="native_resolution">Нативное разрешение</string>
     <string name="library_all">Все</string>
     <string name="library_recent">Недавно запущенные</string>
     <string name="library_all_games">Все игры</string>

@@ -2,6 +2,7 @@ package com.winlator;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -16,6 +17,7 @@ import android.widget.TextView;
 import android.widget.Spinner;
 import android.widget.ArrayAdapter;
 import android.widget.AdapterView;
+import android.widget.LinearLayout;
 import androidx.appcompat.widget.SearchView;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -61,7 +63,7 @@ public class ShortcutsFragment extends BaseFileManagerFragment<Shortcut> {
     private int selectedContainer, generation;
     private String query = "";
     private boolean favoritesOnly, initializing, launchInFlight, restorePosition = true;
-    private boolean loading;
+    private boolean loading, loadFailed;
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -98,7 +100,10 @@ public class ShortcutsFragment extends BaseFileManagerFragment<Shortcut> {
         searchText.setHintTextColor(AppUtils.getThemeColor(requireContext(), R.attr.librarySecondaryText));
         ImageView searchIcon = search.findViewById(androidx.appcompat.R.id.search_mag_icon);
         searchIcon.setColorFilter(AppUtils.getThemeColor(requireContext(), R.attr.librarySecondaryText));
+        ((ImageView)search.findViewById(androidx.appcompat.R.id.search_close_btn)).setColorFilter(
+            AppUtils.getThemeColor(requireContext(), R.attr.librarySecondaryText));
         containerPicker = root.findViewById(R.id.LibraryContainer);
+        containerPicker.setBackgroundResource(R.drawable.library_spinner);
         collectionPicker = root.findViewById(R.id.LibraryCollection);
         emptyView = root.findViewById(R.id.LibraryEmpty);
         emptyHint = root.findViewById(R.id.LibraryEmptyHint);
@@ -136,11 +141,20 @@ public class ShortcutsFragment extends BaseFileManagerFragment<Shortcut> {
         });
         collectionPicker.setOnCheckedChangeListener((group, id) -> { favoritesOnly = id == R.id.LibraryFavorites; filterChanged(); });
         root.findViewById(R.id.LibraryEmptyAction).setOnClickListener(v -> {
+            if (loadFailed) { refreshContent(); return; }
             if (query.isEmpty() && selectedContainer == 0 && !favoritesOnly) ((MainActivity)requireActivity()).navigateTo(R.id.menu_item_containers);
             else {
                 query = ""; selectedContainer = 0; favoritesOnly = false;
                 search.setQuery("", false); containerPicker.setSelection(0); collectionPicker.check(R.id.LibraryAll);
                 applyFilters();
+            }
+        });
+        adaptLibraryLayout(root);
+        recyclerView.addOnLayoutChangeListener((view, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom) -> {
+            if (recyclerView != null && right-left != oldRight-oldLeft && right > left
+                && recyclerView.getLayoutManager() instanceof GridLayoutManager) {
+                ((GridLayoutManager)recyclerView.getLayoutManager()).setSpanCount(
+                    Math.max(1, (int)((right-left) / getResources().getDisplayMetrics().density / 180)));
             }
         });
         initializing = false;
@@ -161,10 +175,12 @@ public class ShortcutsFragment extends BaseFileManagerFragment<Shortcut> {
         updateTitle();
         final int request = ++generation;
         loading = true;
+        loadFailed = false;
         emptyView.setVisibility(View.GONE);
         getView().findViewById(R.id.LibraryLoading).setVisibility(View.VISIBLE);
         final android.app.Activity activity = requireActivity();
         loader.execute(() -> {
+            try {
             List<Shortcut> current = manager.loadShortcuts(selectedFolder);
             List<Shortcut> games = new ArrayList<>();
             Set<String> visited = new HashSet<>();
@@ -178,6 +194,14 @@ public class ShortcutsFragment extends BaseFileManagerFragment<Shortcut> {
                 getView().findViewById(R.id.LibraryLoading).setVisibility(View.GONE);
                 folderItems = current; allGames = games; applyFilters();
             });
+            } catch (RuntimeException exception) {
+                activity.runOnUiThread(() -> {
+                    if (!isAdded() || recyclerView == null || request != generation) return;
+                    loading = false; loadFailed = true;
+                    getView().findViewById(R.id.LibraryLoading).setVisibility(View.GONE);
+                    applyFilters();
+                });
+            }
         });
     }
 
@@ -195,6 +219,14 @@ public class ShortcutsFragment extends BaseFileManagerFragment<Shortcut> {
 
     private void applyFilters() {
         if (recyclerView == null || getView() == null || loading) return;
+        if (loadFailed) {
+            recentSection.setVisibility(View.GONE);
+            emptyView.setVisibility(View.VISIBLE);
+            emptyTextView.setText(R.string.library_load_error);
+            emptyHint.setText(R.string.library_load_error_hint);
+            ((TextView)getView().findViewById(R.id.LibraryEmptyAction)).setText(R.string.library_retry);
+            return;
+        }
         String needle = query.trim().toLowerCase(Locale.ROOT);
         List<Shortcut> source = favoritesOnly || !needle.isEmpty() || selectedContainer != 0 ? allGames : folderItems;
         List<Shortcut> items = new ArrayList<>();
@@ -209,7 +241,8 @@ public class ShortcutsFragment extends BaseFileManagerFragment<Shortcut> {
             return foldersFirst != 0 ? foldersFirst : a.name.compareToIgnoreCase(b.name);
         });
         if (viewStyleNeedsUpdate || recyclerView.getLayoutManager() == null) {
-            int spans = Math.max(2, (int)(getResources().getDisplayMetrics().widthPixels / getResources().getDisplayMetrics().density / 180));
+            int width = recyclerView.getWidth() > 0 ? recyclerView.getWidth() : getResources().getDisplayMetrics().widthPixels;
+            int spans = Math.max(1, (int)(width / getResources().getDisplayMetrics().density / 180));
             recyclerView.setLayoutManager(viewStyle == ViewStyle.GRID ? new GridLayoutManager(requireContext(), spans) : new LinearLayoutManager(requireContext()));
             viewStyleNeedsUpdate = false;
         }
@@ -234,6 +267,36 @@ public class ShortcutsFragment extends BaseFileManagerFragment<Shortcut> {
             ((LinearLayoutManager)recyclerView.getLayoutManager()).scrollToPositionWithOffset(position, preferences.getInt("library_offset", 0));
             restorePosition = false;
         }
+    }
+
+    private void adaptLibraryLayout(View root) {
+        boolean wide = getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE;
+        ((LinearLayout)root).setOrientation(wide ? LinearLayout.HORIZONTAL : LinearLayout.VERTICAL);
+        root.findViewById(R.id.LibraryControls).setLayoutParams(new LinearLayout.LayoutParams(
+            wide ? (int)(260 * getResources().getDisplayMetrics().density) : ViewGroup.LayoutParams.MATCH_PARENT,
+            wide ? ViewGroup.LayoutParams.MATCH_PARENT : ViewGroup.LayoutParams.WRAP_CONTENT));
+        root.findViewById(R.id.LibraryBody).setLayoutParams(new LinearLayout.LayoutParams(
+            wide ? 0 : ViewGroup.LayoutParams.MATCH_PARENT, wide ? ViewGroup.LayoutParams.MATCH_PARENT : 0, 1));
+        ((LinearLayout)root.findViewById(R.id.LibraryFilters)).setOrientation(wide ? LinearLayout.VERTICAL : LinearLayout.HORIZONTAL);
+        containerPicker.setLayoutParams(new LinearLayout.LayoutParams(wide ? ViewGroup.LayoutParams.MATCH_PARENT : 0,
+            ViewGroup.LayoutParams.WRAP_CONTENT, wide ? 0 : 1));
+    }
+
+    @Override public void onOrientationChanged() {
+        if (getView() != null) adaptLibraryLayout(getView());
+        if (recentList != null && recentList.getAdapter() instanceof ShortcutsAdapter) {
+            ShortcutsAdapter adapter = (ShortcutsAdapter)recentList.getAdapter();
+            recentList.setAdapter(new ShortcutsAdapter(adapter.data, true));
+        }
+    }
+
+    private String itemContext(Shortcut item) {
+        String context = item.container.getName();
+        File desktop = new File(item.container.getUserDir(), "Desktop");
+        String parent = item.file.getParentFile().getAbsolutePath(), base = desktop.getAbsolutePath();
+        if (parent.startsWith(base + File.separator)) context += " · " + parent.substring(base.length()+1);
+        if (!item.valid) context += " · " + getString(R.string.library_invalid);
+        return context;
     }
 
     private void updateTitle() {
@@ -396,7 +459,8 @@ public class ShortcutsFragment extends BaseFileManagerFragment<Shortcut> {
             int resource = recent || viewStyle == ViewStyle.LIST ? R.layout.game_library_list_item : R.layout.game_library_grid_item;
             View view = LayoutInflater.from(parent.getContext()).inflate(resource, parent, false);
             if (recent) {
-                view.setLayoutParams(new RecyclerView.LayoutParams((int)(300 * getResources().getDisplayMetrics().density), ViewGroup.LayoutParams.MATCH_PARENT));
+                int widthDp = getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE ? 228 : 300;
+                view.setLayoutParams(new RecyclerView.LayoutParams((int)(widthDp * getResources().getDisplayMetrics().density), ViewGroup.LayoutParams.WRAP_CONTENT));
                 view.setBackgroundResource(R.drawable.library_tint);
             }
             return new ViewHolder(view);
@@ -413,10 +477,12 @@ public class ShortcutsFragment extends BaseFileManagerFragment<Shortcut> {
             else holder.imageView.setImageBitmap(item.icon);
 
             holder.title.setText(item.name);
-            holder.subtitle.setText(item.container.getName());
+            String contextLabel = itemContext(item);
+            holder.subtitle.setText(contextLabel);
 
             holder.favorite.setVisibility(library.isFavorite(item.container.id, item.file) ? View.VISIBLE : View.GONE);
-            holder.launch.setContentDescription(getString(item.file.isDirectory() ? R.string.library_open_folder : R.string.library_launch, item.name));
+            holder.launch.setContentDescription(getString(item.file.isDirectory() ? R.string.library_open_folder : R.string.library_launch, item.name)
+                + ", " + contextLabel + (library.isFavorite(item.container.id, item.file) ? ", " + getString(R.string.favorites) : ""));
             holder.launch.setOnClickListener((v) -> runFromShortcut(item));
             holder.menuButton.setContentDescription(getString(R.string.library_more, item.name));
             holder.menuButton.setOnClickListener((v) -> showListItemMenu(v, item));
@@ -491,6 +557,10 @@ public class ShortcutsFragment extends BaseFileManagerFragment<Shortcut> {
                 updateTitle();
             }
             else {
+                if (!shortcut.valid) {
+                    Snackbar.make(requireView(), R.string.library_invalid_hint, Snackbar.LENGTH_LONG).show();
+                    return;
+                }
                 if (launchInFlight) return;
                 launchInFlight = true;
                 saveBrowseState();

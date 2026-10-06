@@ -21,6 +21,7 @@ public class Shortcut {
     public final File file;
     public final File iconFile;
     public final String wmClass;
+    public final boolean valid;
     private final JSONObject extraData = new JSONObject();
 
     public Shortcut(Container container, File file) {
@@ -33,6 +34,7 @@ public class Shortcut {
             this.icon = null;
             this.iconFile = null;
             this.wmClass = "";
+            this.valid = true;
         }
         else {
             String execArgs = "";
@@ -40,13 +42,16 @@ public class Shortcut {
             File iconFile = null;
             String wmClass = "";
             String section = "";
+            boolean malformed = false;
 
             final short[] iconSizes = {64, 48, 32, 24, 16, 128, 256};
             int index;
             for (String line : FileUtils.readLines(file, true)) {
                 if (line.startsWith("#")) continue;
                 if (line.startsWith("[")) {
-                    section = line.substring(1, line.indexOf("]"));
+                    int closing = line.indexOf("]");
+                    if (closing < 0) { section = ""; malformed = true; continue; }
+                    section = line.substring(1, closing);
                 }
                 else {
                     index = line.indexOf("=");
@@ -81,11 +86,13 @@ public class Shortcut {
             this.iconFile = iconFile;
             this.wmClass = wmClass;
 
-            String path = !execArgs.isEmpty() ? StringUtils.unescapeDOSPath(execArgs.substring(execArgs.lastIndexOf("wine ") + 4)) : "";
+            int wineIndex = execArgs.lastIndexOf("wine ");
+            String path = !execArgs.isEmpty() ? StringUtils.unescapeDOSPath(wineIndex < 0 ? execArgs : execArgs.substring(wineIndex + 4)) : "";
             index = path.indexOf("start.exe ");
             if (index != -1) path = path.substring(index+10);
 
             this.path = path;
+            this.valid = !malformed && !path.isEmpty();
             Container.checkObsoleteOrMissingProperties(extraData);
         }
     }

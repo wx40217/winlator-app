@@ -11,7 +11,7 @@
             android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp"
             android:textStyle="bold" android:minLines="2" android:maxLines="2" android:ellipsize="end" />
         <TextView android:id="@+id/TVSubtitle" android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:textColor="?attr/librarySecondaryText" android:textSize="12sp" android:maxLines="1" android:ellipsize="end" />
+            android:textColor="?attr/librarySecondaryText" android:textSize="12sp" android:maxLines="2" android:ellipsize="end" />
     </LinearLayout>
     <ImageButton android:id="@+id/BTMenu" android:layout_width="48dp" android:layout_height="48dp"
         android:layout_gravity="top|end" android:layout_margin="8dp" android:background="?attr/selectableItemBackgroundBorderless"

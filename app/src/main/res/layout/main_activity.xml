@@ -21,12 +21,21 @@
             app:titleTextColor="?attr/libraryOnHeader"
             app:title="@string/app_name" />
 
+        <LinearLayout android:layout_width="match_parent" android:layout_height="0dp"
+            android:layout_weight="1" android:orientation="horizontal">
+        <com.google.android.material.navigationrail.NavigationRailView
+            android:id="@+id/LibraryNavigationRail"
+            android:layout_width="80dp" android:layout_height="match_parent"
+            android:visibility="gone" android:background="?attr/libraryCard"
+            app:itemIconTint="@color/library_navigation" app:itemTextColor="@color/library_navigation"
+            app:labelVisibilityMode="labeled" app:menuGravity="top" app:menu="@menu/library_navigation" />
         <FrameLayout
             android:id="@+id/FLFragmentContainer"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
             android:layout_weight="1"
             app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
+        </LinearLayout>
         <com.google.android.material.bottomnavigation.BottomNavigationView
             android:id="@+id/LibraryNavigation"
             android:layout_width="match_parent" android:layout_height="wrap_content"
