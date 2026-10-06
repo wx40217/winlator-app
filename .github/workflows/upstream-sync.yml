@@ -1,0 +1,101 @@
+name: Weekly upstream sync
+on:
+  schedule:
+    - cron: '17 2 * * 1'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: weekly-upstream-sync
+  cancel-in-progress: false
+jobs:
+  prepare:
+    if: github.repository == 'wx40217/winlator-app'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    outputs:
+      changed: ${{ steps.plan.outputs.changed }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: main
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Prepare merge without overwriting fork changes
+        id: plan
+        run: |
+          python3 scripts/test_upstream_sync.py
+          cp scripts/upstream_sync.py "$RUNNER_TEMP/upstream_sync.py"
+          python3 "$RUNNER_TEMP/upstream_sync.py" prepare --kind app --output "$RUNNER_TEMP/candidate"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: steps.plan.outputs.changed == 'true'
+        with:
+          name: sync-candidate
+          path: |
+            ${{ runner.temp }}/candidate/plan.json
+            ${{ runner.temp }}/candidate/candidate.bundle
+          retention-days: 7
+          if-no-files-found: error
+  validate:
+    needs: prepare
+    if: needs.prepare.outputs.changed == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: main
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: sync-candidate
+          path: ${{ runner.temp }}/candidate
+      - name: Check out the exact candidate with trusted verification script
+        run: |
+          cp scripts/verify_sync.py "$RUNNER_TEMP/verify_sync.py"
+          git fetch "$RUNNER_TEMP/candidate/candidate.bundle" refs/heads/sync-candidate
+          candidate=$(python3 -c 'import json,os; print(json.load(open(os.environ["RUNNER_TEMP"]+"/candidate/plan.json"))["candidate"])')
+          test "$(git rev-parse FETCH_HEAD)" = "$candidate"
+          git checkout --detach "$candidate"
+          git submodule update --init --recursive
+      - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3 # v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Install required SDK components using runner's existing Android SDK
+        run: sdkmanager 'platforms;android-35' 'build-tools;34.0.0' 'ndk;24.0.8215888' 'cmake;3.22.1'
+      - name: Build debug APK, run unit tests, verify fork and APK integrity
+        run: python3 "$RUNNER_TEMP/verify_sync.py" .
+  integrate:
+    needs: [prepare, validate]
+    if: needs.prepare.outputs.changed == 'true' && needs.validate.result == 'success'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: sync-candidate
+          path: ${{ runner.temp }}/candidate
+      - name: Create or reuse PR, merge expected head, verify remote main
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python3 scripts/upstream_sync.py publish --output "$RUNNER_TEMP/candidate"
+  takeover:
+    needs: [prepare, validate, integrate]
+    if: always() && (needs.prepare.result == 'failure' || needs.validate.result == 'failure' || needs.integrate.result == 'failure' || needs.prepare.result == 'cancelled' || needs.validate.result == 'cancelled' || needs.integrate.result == 'cancelled')
+    runs-on: ubuntu-24.04
+    permissions: {}
+    steps:
+      - name: Leave failure state for Codex takeover
+        run: |
+          echo '::error::UPSTREAM_SYNC_NEEDS_TAKEOVER: inspect prepare, validate and integrate logs; handle app before main.'
+          echo 'UPSTREAM_SYNC_NEEDS_TAKEOVER — inspect failed jobs in this run. No external notification was sent.' >> "$GITHUB_STEP_SUMMARY"
+          exit 1
