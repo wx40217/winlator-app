@@ -1,15 +1,30 @@
 apply plugin: 'com.android.application'
 
+// Upstream guest ELF files embed absolute paths. Keep the package byte length
+// unchanged so extraction can rebase those paths without moving ELF offsets.
+def forkApplicationId = 'com.wxwinlat'
+assert forkApplicationId.length() == 'com.winlator'.length()
+
 android {
     namespace 'com.winlator'
     compileSdk 35
 
     defaultConfig {
-        applicationId 'com.winlator'
+        applicationId forkApplicationId
         minSdkVersion 26
         targetSdkVersion 28
-        versionCode 33
-        versionName "11.2"
+        versionCode 34
+        versionName "11.2-fork.1"
+
+        externalNativeBuild {
+            cmake {
+                arguments "-DWINLATOR_APPLICATION_ID=${forkApplicationId}"
+            }
+        }
+    }
+
+    buildFeatures {
+        buildConfig true
     }
 
     buildTypes {
